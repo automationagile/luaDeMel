@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .question {
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Answer All Questions</h1>
+  <form id="questionsForm" method="POST" action="/submit-answers">
+    <div class="question">
+      <label for="q1">1. What is 2 + 2?</label><br>
+      <input type="text" id="q1" name="answers[]" required>
+    </div>
+    <div class="question">
+      <label for="q2">2. What is the capital of France?</label><br>
+      <input type="text" id="q2" name="answers[]" required>
+    </div>
+    <div class="question">
+      <label for="q3">3. What color is the sky on a clear day?</label><br>
+      <input type="text" id="q3" name="answers[]" required>
+    </div>
+    <div class="question">
+      <label for="q4">4. What is 5 x 5?</label><br>
+      <input type="text" id="q4" name="answers[]" required>
+    </div>
+    <div class="question">
+      <label for="q5">5. What is the square root of 16?</label><br>
+      <input type="text" id="q5" name="answers[]" required>
+    </div>
+    <div class="question">
+      <label for="q6">6. What is the chemical symbol for water?</label><br>
+      <input type="text" id="q6" name="answers[]" required>
+    </div>
+    <button type="submit">Submit Answers</button>
+  </form>
+  <p class="error" id="error"></p>
+</body>
+</html>
