@@ -7,7 +7,23 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+      background-image: url('background.png'); /* Image path */
+      background-size: cover; /* Cover the entire page */
+      background-repeat: no-repeat;
+      background-position: center;
+      color: white; /* Adjust text color for contrast */
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.6); /* Add a translucent background for content */
+      padding: 20px;
+      max-width: 600px;
+      margin: 50px auto;
+      border-radius: 10px;
+    }
+    h1 {
+      text-align: center;
     }
     .question {
       margin-bottom: 20px;
@@ -29,34 +45,36 @@
   </style>
 </head>
 <body>
-  <h1>Answer All Questions</h1>
-  <form id="questionsForm" method="POST" action="/submit-answers">
-    <div class="question">
-      <label for="q1">1. What is 2 + 2?</label><br>
-      <input type="text" id="q1" name="answers[]" required>
-    </div>
-    <div class="question">
-      <label for="q2">2. What is the capital of France?</label><br>
-      <input type="text" id="q2" name="answers[]" required>
-    </div>
-    <div class="question">
-      <label for="q3">3. What color is the sky on a clear day?</label><br>
-      <input type="text" id="q3" name="answers[]" required>
-    </div>
-    <div class="question">
-      <label for="q4">4. What is 5 x 5?</label><br>
-      <input type="text" id="q4" name="answers[]" required>
-    </div>
-    <div class="question">
-      <label for="q5">5. What is the square root of 16?</label><br>
-      <input type="text" id="q5" name="answers[]" required>
-    </div>
-    <div class="question">
-      <label for="q6">6. What is the chemical symbol for water?</label><br>
-      <input type="text" id="q6" name="answers[]" required>
-    </div>
-    <button type="submit">Submit Answers</button>
-  </form>
-  <p class="error" id="error"></p>
+  <div class="container">
+    <h1>Answer All Questions</h1>
+    <form id="questionsForm" method="POST" action="/submit-answers">
+      <div class="question">
+        <label for="q1">1. What is 2 + 2?</label><br>
+        <input type="text" id="q1" name="answers[]" required>
+      </div>
+      <div class="question">
+        <label for="q2">2. What is the capital of France?</label><br>
+        <input type="text" id="q2" name="answers[]" required>
+      </div>
+      <div class="question">
+        <label for="q3">3. What color is the sky on a clear day?</label><br>
+        <input type="text" id="q3" name="answers[]" required>
+      </div>
+      <div class="question">
+        <label for="q4">4. What is 5 x 5?</label><br>
+        <input type="text" id="q4" name="answers[]" required>
+      </div>
+      <div class="question">
+        <label for="q5">5. What is the square root of 16?</label><br>
+        <input type="text" id="q5" name="answers[]" required>
+      </div>
+      <div class="question">
+        <label for="q6">6. What is the chemical symbol for water?</label><br>
+        <input type="text" id="q6" name="answers[]" required>
+      </div>
+      <button type="submit">Submit Answers</button>
+    </form>
+    <p class="error" id="error"></p>
+  </div>
 </body>
 </html>
