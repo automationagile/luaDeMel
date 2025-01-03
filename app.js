@@ -1,60 +1,83 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const path = require('path');
 
 const app = express();
-const port = 4000;
+const port = process.env.PORT || 4000;
 
-// Use body-parser to parse form data
-app.use(bodyParser.urlencoded({ extended: true }));
+// Middleware to parse JSON and URL-encoded body
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Serve static files (like the PDF)
-app.use(express.static('public'));
+// Serve static files from the "public" folder
+app.use('/static', express.static(path.join(__dirname, 'public')));
 
-// Questions and their correct answers
+// Questions and answers stored securely on the server
 const questions = [
   { question: "What is 2 + 2?", answer: "4" },
   { question: "What is the capital of France?", answer: "Paris" },
-  { question: "What color is the sky on a clear day?", answer: "blue" },
+  { question: "What color is the sky on a clear day?", answer: "Blue" },
   { question: "What is 5 x 5?", answer: "25" },
   { question: "What is the square root of 16?", answer: "4" },
   { question: "What is the chemical symbol for water?", answer: "H2O" },
 ];
 
-// Serve the HTML form
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Serve a question based on its index
+app.get('/question', (req, res) => {
+  const index = parseInt(req.query.index, 10);
 
-// Handle form submission
-app.post('/submit-answers', (req, res) => {
-  const userAnswers = req.body['answers[]'];
-
-  // Validate answers
-  const allCorrect = questions.every((q, index) => 
-    q.answer.toLowerCase() === (userAnswers[index] || "").toLowerCase()
-  );
-
-  if (allCorrect) {
-    // If all answers are correct, send the PDF
-    res.download(path.join(__dirname, 'public', 'example.pdf'), 'example.pdf');
+  if (index < questions.length) {
+    const question = questions[index];
+    res.json({ question: question.question });
   } else {
-    // If answers are incorrect, redirect back to the form with an error
-    res.send(`
-      <script>
-        alert("Some answers are incorrect. Please try again!");
-        window.history.back();
-      </script>
-    `);
+    res.status(404).send('No more questions.');
   }
 });
 
-// Serve static files from the "public" folder
-app.use(express.static(path.join(__dirname, 'public')));
+const failImages = [
+  "/static/error1.png",
+  "/static/error2.png",
+  "/static/error3.png",
+  "/static/error4.png",
+  "/static/error5.png",
+];
 
-// Serve the HTML file
+// Validate the user's answer
+app.post('/answer', (req, res) => {
+  const index = parseInt(req.query.index, 10);
+  const userAnswer = req.body.answer;
+
+  if (index < questions.length) {
+    const correctAnswer = questions[index].answer;
+    if (userAnswer && userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+      res.json({ correct: true });
+    } else {
+      // Pick a random fail image
+      const randomImage = failImages[Math.floor(Math.random() * failImages.length)];
+      res.json({
+        correct: false,
+        message: "Grandes nabos! Com essa resposta quem vai aproveitar a viagem somos nós",
+        imageUrl: randomImage, // Send the random image URL
+      });
+    }
+  } else {
+    res.status(404).send('Invalid question index.');
+  }
+});
+
+// Serve the main HTML file
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Endpoint to download the PDF
+app.get('/download/doc1', (req, res) => {
+  res.download(path.join(__dirname, 'public', 'viagem.pdf'), 'viagem.pdf');
+});
+app.get('/download/doc2', (req, res) => {
+  res.download(path.join(__dirname, 'public', 'seguro.pdf'), 'seguro.pdf');
+});
+app.get('/download/doc3', (req, res) => {
+  res.download(path.join(__dirname, 'public', 'atividade.pdf'), 'atividade.pdf');
 });
 
 // Start the server

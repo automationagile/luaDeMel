@@ -3,30 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Question App</title>
+  <title>Step-by-Step Questions</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      background-image: url('public/background.png'); /* Image path */
-      background-size: cover; /* Cover the entire page */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image: url('/static/landscape.png');
+      background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
-      color: white; /* Adjust text color for contrast */
     }
     .container {
-      background: rgba(0, 0, 0, 0.6); /* Add a translucent background for content */
+      background: rgba(255, 255, 255, 0.9);
       padding: 20px;
-      max-width: 600px;
-      margin: 50px auto;
-      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      text-align: center;
     }
     h1 {
-      text-align: center;
+      margin-bottom: 20px;
     }
     .question {
       margin-bottom: 20px;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+    img {
+      margin-top: 20px;
+      max-width: 100%;
+      height: auto;
+      display: none;
     }
     button {
       padding: 10px 20px;
@@ -35,46 +50,90 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      margin: 5px;
     }
     button:hover {
       background-color: #0056b3;
-    }
-    .error {
-      color: red;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Answer All Questions</h1>
-    <form id="questionsForm" method="POST" action="/submit-answers">
-      <div class="question">
-        <label for="q1">1. What is 2 + 2?</label><br>
-        <input type="text" id="q1" name="answers[]" required>
+    <div id="introduction">
+      <h1>Bem-vindo! Vamos testar seus conhecimentos</h1>
+      <p>Para acessar os documentos exclusivos, você precisa responder corretamente a algumas perguntas. Boa sorte!</p>
+      <button id="startButton">Iniciar Perguntas</button>
+    </div>
+    <div id="questionSection" style="display: none;">
+      <div id="questionContainer">
+        <label id="questionText"></label><br>
+        <input type="text" id="answerInput" placeholder="Sua resposta">
+        <button id="submitAnswer">Enviar Resposta</button>
+        <p class="error" id="errorMessage"></p>
+        <img id="errorImage" src="" alt="Error">
       </div>
-      <div class="question">
-        <label for="q2">2. What is the capital of France?</label><br>
-        <input type="text" id="q2" name="answers[]" required>
+      <div id="downloadButtons" style="display: none;">
+        <button onclick="window.location.href='/download/doc1'">Viagem</button>
+        <button onclick="window.location.href='/download/doc2'">Seguro</button>
+        <button onclick="window.location.href='/download/doc3'">Atividade</button>
       </div>
-      <div class="question">
-        <label for="q3">3. What color is the sky on a clear day?</label><br>
-        <input type="text" id="q3" name="answers[]" required>
-      </div>
-      <div class="question">
-        <label for="q4">4. What is 5 x 5?</label><br>
-        <input type="text" id="q4" name="answers[]" required>
-      </div>
-      <div class="question">
-        <label for="q5">5. What is the square root of 16?</label><br>
-        <input type="text" id="q5" name="answers[]" required>
-      </div>
-      <div class="question">
-        <label for="q6">6. What is the chemical symbol for water?</label><br>
-        <input type="text" id="q6" name="answers[]" required>
-      </div>
-      <button type="submit">Submit Answers</button>
-    </form>
-    <p class="error" id="error"></p>
+    </div>
   </div>
+  <script>
+    const startButton = document.getElementById("startButton");
+    const introduction = document.getElementById("introduction");
+    const questionSection = document.getElementById("questionSection");
+    const questionText = document.getElementById("questionText");
+    const answerInput = document.getElementById("answerInput");
+    const submitAnswer = document.getElementById("submitAnswer");
+    const errorMessage = document.getElementById("errorMessage");
+    const errorImage = document.getElementById("errorImage");
+    const questionContainer = document.getElementById("questionContainer");
+    const downloadButtons = document.getElementById("downloadButtons");
+
+    let currentQuestionIndex = 0;
+
+    startButton.addEventListener("click", () => {
+      introduction.style.display = "none";
+      questionSection.style.display = "block";
+      loadQuestion();
+    });
+
+    async function loadQuestion() {
+      const response = await fetch(`/question?index=${currentQuestionIndex}`);
+      if (response.ok) {
+        const data = await response.json();
+        questionText.textContent = data.question;
+        answerInput.value = "";
+        errorMessage.textContent = "";
+        errorImage.style.display = "none";
+      } else {
+        questionContainer.style.display = "none";
+        downloadButtons.style.display = "block";
+      }
+    }
+
+    submitAnswer.addEventListener("click", async () => {
+      const userAnswer = answerInput.value.trim();
+      const response = await fetch(`/answer?index=${currentQuestionIndex}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answer: userAnswer }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.correct) {
+        currentQuestionIndex++;
+        loadQuestion();
+      } else {
+        errorMessage.textContent = result.message || "Resposta incorreta. Tente novamente.";
+        if (result.imageUrl) {
+          errorImage.src = result.imageUrl;
+          errorImage.style.display = "block";
+        }
+      }
+    });
+  </script>
 </body>
 </html>
