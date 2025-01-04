@@ -55,7 +55,7 @@ app.post('/answer', (req, res) => {
       const randomImage = failImages[Math.floor(Math.random() * failImages.length)];
       res.json({
         correct: false,
-        message: "Grandes nabos! Com essa resposta quem vai aproveitar a viagem somos nós",
+        message: "Grandes nabos! Com essa resposta quem vai aproveitar a viagem somos nós.",
         imageUrl: randomImage, // Send the random image URL
       });
     }
