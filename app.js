@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the "public" folder
-app.use('/static', express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
 
 // Questions and answers stored securely on the server
 const questions = [
@@ -34,11 +34,11 @@ app.get('/question', (req, res) => {
 });
 
 const failImages = [
-  "/static/error1.png",
-  "/static/error2.png",
-  "/static/error3.png",
-  "/static/error4.png",
-  "/static/error5.png",
+  "error1.png",
+  "error2.png",
+  "error3.png",
+  "error4.png",
+  "error5.png",
 ];
 
 // Validate the user's answer
@@ -63,6 +63,9 @@ app.post('/answer', (req, res) => {
     res.status(404).send('Invalid question index.');
   }
 });
+
+// Serve static files from the "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve the main HTML file
 app.get('/', (req, res) => {

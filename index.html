@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Step-by-Step Questions</title>
+  <title>Lua de Mel</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background-image: url('/static/landscape.png');
+      background-image: url('./public/landscape.png');
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
@@ -60,22 +60,24 @@
 <body>
   <div class="container">
     <div id="introduction">
-      <h1>Bem-vindo! Vamos testar seus conhecimentos</h1>
-      <p>Para acessar os documentos exclusivos, você precisa responder corretamente a algumas perguntas. Boa sorte!</p>
-      <button id="startButton">Iniciar Perguntas</button>
+      <h1>Bem-vindos ao quem quer ir de lua de mel!!!</h1>
+      <p>Para terem acesso á vossa lua de mel terão que responder corretamente a um questionário bastante complexo. As respostas serão sempre uma única palavra com letras minusculas. Boa sorte!</p>
+      <button id="startButton">Que o spider man nos ajude!</button>
     </div>
     <div id="questionSection" style="display: none;">
       <div id="questionContainer">
         <label id="questionText"></label><br>
-        <input type="text" id="answerInput" placeholder="Sua resposta">
-        <button id="submitAnswer">Enviar Resposta</button>
+        <input type="text" id="answerInput" placeholder="Dementor">
+        <button id="submitAnswer">Expecto Patronum</button>
         <p class="error" id="errorMessage"></p>
         <img id="errorImage" src="" alt="Error">
       </div>
       <div id="downloadButtons" style="display: none;">
-        <button onclick="window.location.href='/download/doc1'">Viagem</button>
-        <button onclick="window.location.href='/download/doc2'">Seguro</button>
-        <button onclick="window.location.href='/download/doc3'">Atividade</button>
+        <h2>Parabéns!</h2>
+        <p>Esperamos que tenham um grande casamento e depois sim a merecida lua de mel!</p>
+        <button onclick="window.location.href='./public/viagem.pdf'">Viagem</button>
+        <button onclick="window.location.href='./public/seguro.pdf'">Seguro</button>
+        <button onclick="window.location.href='./public/atividade.pdf'">Atividade</button>
       </div>
     </div>
   </div>
@@ -91,19 +93,32 @@
     const questionContainer = document.getElementById("questionContainer");
     const downloadButtons = document.getElementById("downloadButtons");
 
+    const questionsUrl = './public/questions.json';
+    const failImages = [
+      "./public/error1.png",
+      "./public/error2.png",
+      "./public/error3.png",
+      "./public/error4.png",
+      "./public/error5.png",
+    ];
+
+    let questions = [];
     let currentQuestionIndex = 0;
 
-    startButton.addEventListener("click", () => {
-      introduction.style.display = "none";
-      questionSection.style.display = "block";
-      loadQuestion();
-    });
+    async function loadQuestions() {
+      const response = await fetch(questionsUrl);
+      if (response.ok) {
+        questions = await response.json();
+        loadQuestion();
+      } else {
+        console.error('Failed to load questions.');
+      }
+    }
 
     async function loadQuestion() {
-      const response = await fetch(`/question?index=${currentQuestionIndex}`);
-      if (response.ok) {
-        const data = await response.json();
-        questionText.textContent = data.question;
+      if (currentQuestionIndex < questions.length) {
+        const questionData = questions[currentQuestionIndex];
+        questionText.textContent = questionData.question;
         answerInput.value = "";
         errorMessage.textContent = "";
         errorImage.style.display = "none";
@@ -113,26 +128,25 @@
       }
     }
 
-    submitAnswer.addEventListener("click", async () => {
+    submitAnswer.addEventListener("click", () => {
       const userAnswer = answerInput.value.trim();
-      const response = await fetch(`/answer?index=${currentQuestionIndex}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answer: userAnswer }),
-      });
+      const correctAnswer = questions[currentQuestionIndex].answer;
 
-      const result = await response.json();
-
-      if (response.ok && result.correct) {
+      if (userAnswer && userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
         currentQuestionIndex++;
         loadQuestion();
       } else {
-        errorMessage.textContent = result.message || "Resposta incorreta. Tente novamente.";
-        if (result.imageUrl) {
-          errorImage.src = result.imageUrl;
-          errorImage.style.display = "block";
-        }
+        errorMessage.textContent = "Grandes nabos! Com essa resposta quem vai aproveitar a viagem somos nós.";
+        const randomImage = failImages[Math.floor(Math.random() * failImages.length)];
+        errorImage.src = randomImage;
+        errorImage.style.display = "block";
       }
+    });
+
+    startButton.addEventListener("click", () => {
+      introduction.style.display = "none";
+      questionSection.style.display = "block";
+      loadQuestions();
     });
   </script>
 </body>
